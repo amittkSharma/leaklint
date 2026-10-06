@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -21,7 +21,7 @@ test('clean project exits 0', async () => {
   const dir = await project({ 'src/a.ts': 'logger.info({ userId });' });
   const r = run(dir, 'src');
   assert.equal(r.status, 0);
-  assert.match(r.stdout, /0 errors, 0 warnings in 1 file/);
+  assert.match(r.stdout, /0 errors, 0 warnings; 1 file in the repo: 1 read/);
 });
 
 test('a leak exits 1 and never prints the value', async () => {
@@ -47,13 +47,21 @@ test('sarif and junit formats, and --output', async () => {
 });
 
 test('config file severity is honoured', async () => {
-  const dir = await project({ 'src/a.ts': 'logger.info({ password });', 'leaklint.config.json': '{"rules":{"no-sensitive-key":"warn"}}' });
+  const dir = await project({
+    'src/a.ts': 'logger.info({ password });',
+    'leaklint.config.json': '{"rules":{"no-sensitive-key":"warn"}}',
+  });
   assert.equal(run(dir, 'src').status, 0);
 });
 
 test('usage and input errors exit 2 with one line, no stack trace', async () => {
   const dir = await project({ 'src/a.ts': '' });
-  for (const args of [['src', '--format', 'xml'], ['nope'], ['src', '--config', 'missing.json'], ['src', '--max-warnings', 'x']]) {
+  for (const args of [
+    ['src', '--format', 'xml'],
+    ['nope'],
+    ['src', '--config', 'missing.json'],
+    ['src', '--max-warnings', 'x'],
+  ]) {
     const r = run(dir, ...args);
     assert.equal(r.status, 2, args.join(' '));
     assert.doesNotMatch(r.stderr, /\n\s+at /);

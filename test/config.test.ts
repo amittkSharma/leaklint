@@ -20,3 +20,8 @@ test('invalid config fails with a one-line message', () => {
   assert.throws(() => mergeConfig({ rules: { 'no-pii-value': 'fatal' } }), /severity must be error, warn or off/);
   assert.throws(() => mergeConfig({ keys: { groups: ['x'] } }), /Unknown key group "x"/);
 });
+
+test('an invalid regex entry is rejected with the field name', () => {
+  assert.throws(() => mergeConfig({ keys: { add: ['/(/'] } }), /keys\.add: "\/\(\/" is not a valid regular expression/);
+  assert.throws(() => mergeConfig({ sinks: ['/[/'] }), /sinks: /);
+});

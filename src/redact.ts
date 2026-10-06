@@ -1,32 +1,48 @@
 import ts from 'typescript';
 import { normalize } from './keys.js';
-import { calleeName } from './sinks.js';
+import { calleeName } from './syntax.js';
 
-const strings = (e: ts.Expression): string[] =>
-  ts.isArrayLiteralExpression(e) ? e.elements.filter(ts.isStringLiteralLike).map((s) => s.text) : [];
+const stringValues = (expression: ts.Expression): string[] =>
+  ts.isArrayLiteralExpression(expression) ? expression.elements.filter(ts.isStringLiteralLike).map((s) => s.text) : [];
 
-/** Normalised last path segments from `pino({ redact: [...] | { paths: [...] } })` calls in this file. */
+const propertyNamed = (object: ts.ObjectLiteralExpression, name: string): ts.Expression | undefined => {
+  const property = object.properties.find(
+    (p): p is ts.PropertyAssignment => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === name,
+  );
+  return property?.initializer;
+};
+
+/** `pino({ redact: [...] })` or `pino({ redact: { paths: [...] } })` -> the redacted paths. */
+function redactPaths(options: ts.Expression): string[] {
+  if (!ts.isObjectLiteralExpression(options)) return [];
+  const redact = propertyNamed(options, 'redact');
+  if (!redact) return [];
+  const paths = ts.isObjectLiteralExpression(redact) ? propertyNamed(redact, 'paths') : redact;
+  return paths ? stringValues(paths) : [];
+}
+
+/** `req.headers["authorization"]` and `a.b.authorization` both end in `authorization`. */
+const lastSegment = (path: string): string =>
+  path
+    .replace(/\[['"]?([^\]'"]+)['"]?\]$/, '.$1')
+    .split('.')
+    .pop() ?? '';
+
+/**
+ * Normalised last path segments of every `pino({ redact })` call in the file. Matching on the last segment only
+ * is deliberately loose: a key redacted anywhere in the file is treated as redacted everywhere in it.
+ */
 export function pinoRedacted(sf: ts.SourceFile): Set<string> {
-  const out = new Set<string>();
-  const visit = (n: ts.Node): void => {
-    if (ts.isCallExpression(n) && calleeName(n.expression) === 'pino') {
-      const opts = n.arguments[0];
-      if (opts && ts.isObjectLiteralExpression(opts)) {
-        for (const p of opts.properties) {
-          if (!ts.isPropertyAssignment(p) || !ts.isIdentifier(p.name) || p.name.text !== 'redact') continue;
-          const v = p.initializer;
-          const paths = ts.isObjectLiteralExpression(v)
-            ? v.properties.flatMap((q) => (ts.isPropertyAssignment(q) && ts.isIdentifier(q.name) && q.name.text === 'paths' ? strings(q.initializer) : []))
-            : strings(v);
-          for (const path of paths) {
-            const last = path.replace(/\[['"]?([^\]'"]+)['"]?\]$/, '.$1').split('.').pop() ?? '';
-            if (last && last !== '*') out.add(normalize(last));
-          }
-        }
+  const redacted = new Set<string>();
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && calleeName(node.expression) === 'pino' && node.arguments[0]) {
+      for (const path of redactPaths(node.arguments[0])) {
+        const segment = lastSegment(path);
+        if (segment && segment !== '*') redacted.add(normalize(segment));
       }
     }
-    ts.forEachChild(n, visit);
+    ts.forEachChild(node, visit);
   };
   visit(sf);
-  return out;
+  return redacted;
 }

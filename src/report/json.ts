@@ -1,5 +1,16 @@
 import type { ScanResult } from '../types.js';
-import { count } from './text.js';
+import { TITLE, TOOL, VERSION } from './meta.js';
+import { summary } from './summary.js';
 
-export const json = (r: ScanResult): string =>
-  JSON.stringify({ summary: { ...count(r), files: r.files }, findings: r.findings, warnings: r.warnings }, null, 2);
+export const json = (result: ScanResult): string =>
+  JSON.stringify(
+    {
+      title: TITLE,
+      source: { tool: TOOL, version: VERSION },
+      summary: summary(result),
+      findings: result.findings,
+      skipped: result.skipped,
+    },
+    null,
+    2,
+  );
