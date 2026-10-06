@@ -12,13 +12,13 @@ test('flags sensitive head nouns in any naming style', () => {
 });
 
 test('flags personal identifiers by key name', () => {
-  for (const k of ['dob', 'dateOfBirth', 'passportNumber', 'nhsNumber', 'healthInsuranceId', 'clientIp', 'ip_address', 'X-Forwarded-For', 'homeAddress', 'postcode', 'mobile', 'nino', 'socialSecurityNumber']) {
+  for (const k of ['dob', 'dateOfBirth', 'passportNumber', 'nhsNumber', 'healthInsuranceId', 'clientIp', 'ip_address', 'X-Forwarded-For', 'homeAddress', 'billing_address', 'postcode', 'mobile', 'nino', 'socialSecurityNumber']) {
     assert.equal(m(k), 'pii', k);
   }
 });
 
 test('does not flag lookalikes', () => {
-  for (const k of ['tokenCount', 'cacheKey', 'emailVerified', 'isPasswordValid', 'username', 'passwordHash', 'tokenizer', 'author', 'keyboard', 'addressCount', 'ipv4Regex', 'zipped', 'telemetry']) {
+  for (const k of ['tokenCount', 'cacheKey', 'emailVerified', 'isPasswordValid', 'username', 'passwordHash', 'tokenizer', 'author', 'keyboard', 'addressCount', 'ipv4Regex', 'address', 'zipped', 'telemetry']) {
     assert.equal(m(k), undefined, k);
   }
 });

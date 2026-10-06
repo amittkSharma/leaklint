@@ -120,7 +120,7 @@ Key matching (used by `no-sensitive-key`):
   - date of birth: `dob`, `dateofbirth`, `birthdate`
   - passport: `passport`, `passportnumber`
   - health insurance: `insurancenumber`, `healthinsuranceid`, `nhsnumber`, `mbi`
-  - residential address: `address`, `homeaddress`, `street`, `postcode`, `zip`
+  - residential address: `homeaddress`, `streetaddress`, `billingaddress` (and similar qualified forms), `street`, `postcode`, `zip`; bare `address` is deliberately excluded, because `server.address()` is a bind address (found in the audit)
   - phone: `phone`, `mobile`, `tel`
   - IP address: `ip`, `ipaddress`, `clientip`, `remoteaddress`, `xforwardedfor`
   - government ID: `ssn`, `socialsecuritynumber`, `nino`, `nationalinsurancenumber`

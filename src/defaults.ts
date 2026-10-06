@@ -10,7 +10,8 @@ export const DEFAULT_KEYS: Record<Group, string[]> = {
     'dob', 'dateofbirth', 'birthdate',
     'passport', 'passportnumber',
     'insurancenumber', 'healthinsuranceid', 'nhsnumber', 'mbi',
-    'address', 'streetaddress', 'homeaddress', 'street', 'postcode', 'zip',
+    // bare `address` is omitted on purpose: `server.address()` is a bind address, not a person's (audit finding).
+    'streetaddress', 'homeaddress', 'residentialaddress', 'useraddress', 'customeraddress', 'billingaddress', 'shippingaddress', 'mailingaddress', 'postaladdress', 'street', 'postcode', 'zip',
     'ip', 'ipaddress', 'clientip', 'remoteaddress', 'xforwardedfor',
   ],
   financial: ['creditcard', 'cardnumber', 'cvv', 'cvc', 'iban', 'accountnumber'],
