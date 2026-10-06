@@ -1,7 +1,7 @@
 {
-  "name": "leaklint",
+  "name": "@amittksharma/leaklint",
   "version": "0.0.1",
-  "description": "Static CI gate that finds log statements writing secrets or personal data (PII) in JS/TS. Knows console, stdout/stderr, pino, winston, bunyan.",
+  "description": "Find log statements that leak secrets or personal data (PII) in JavaScript and TypeScript. A zero-config CI gate with fix suggestions, baselines for legacy code, and SARIF, JUnit and HTML reports.",
   "type": "module",
   "bin": {
     "leaklint": "dist/src/cli.js"
@@ -13,33 +13,61 @@
     "build": "tsc",
     "test": "yarn build && node --test \"dist/test/**/*.test.js\"",
     "types": "tsc --noEmit",
-    "prepublishOnly": "yarn test"
+    "lint": "biome check .",
+    "release": "commit-and-tag-version",
+    "release:first": "commit-and-tag-version --first-release",
+    "prepublishOnly": "yarn test",
+    "format": "biome check --write ."
   },
   "engines": {
     "node": ">=20"
   },
   "keywords": [
-    "pii",
     "logging",
-    "security",
+    "log-security",
+    "pii",
     "gdpr",
+    "secrets",
+    "secret-detection",
+    "sensitive-data",
+    "data-leak",
+    "data-leak-prevention",
+    "static-analysis",
+    "sast",
+    "devsecops",
+    "security",
+    "compliance",
+    "linter",
+    "ci",
     "pino",
     "winston",
+    "bunyan",
     "sarif",
     "junit",
-    "static-analysis",
-    "ssn",
-    "secrets"
+    "typescript",
+    "javascript",
+    "cli"
   ],
   "license": "MIT",
   "dependencies": {
     "typescript": "^5.6.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0"
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "^22.0.0",
+    "commit-and-tag-version": "^13.2.1"
   },
   "publishConfig": {
     "provenance": true,
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amittkSharma/leaklint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amittkSharma/leaklint/issues"
+  },
+  "homepage": "https://github.com/amittkSharma/leaklint#readme",
+  "author": "Amitt K Sharma"
 }

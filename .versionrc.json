@@ -1,0 +1,16 @@
+{
+	"types": [
+		{ "type": "feat", "section": "Features" },
+		{ "type": "fix", "section": "Bug Fixes" },
+		{ "type": "perf", "section": "Performance" },
+		{ "type": "docs", "section": "Documentation" },
+		{ "type": "refactor", "section": "Refactoring" },
+		{ "type": "chore", "hidden": true },
+		{ "type": "test", "hidden": true },
+		{ "type": "ci", "hidden": true }
+	],
+	"tagPrefix": "v",
+	"releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+	"commitUrlFormat": "https://github.com/{{owner}}/{{repository}}/commit/{{hash}}",
+	"compareUrlFormat": "https://github.com/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}"
+}
