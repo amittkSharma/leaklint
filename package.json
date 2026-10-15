@@ -58,7 +58,6 @@
     "commit-and-tag-version": "^13.2.1"
   },
   "publishConfig": {
-    "provenance": true,
     "access": "public"
   },
   "repository": {
